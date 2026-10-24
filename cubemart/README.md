@@ -38,4 +38,4 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 Configure these URLs in the Vercel project environment variables:
 
 - `APP_BASE_URL`: the public origin of the CubeMart web app (for example, its Vercel deployment URL). This is used for Stripe checkout return URLs and should remain a private server-side variable.
-- `NEXT_PUBLIC_SOCKET_SERVER`: the origin of the Socket.IO server. This is intentionally public because the browser connects to it.
+- `NEXT_SOCKET_SERVER`: the origin of the Socket.IO server. Set it on the Next.js app to let server-side notifications connect and provide the address to the browser at runtime. The address is visible to browser users because their Socket.IO client must connect to it; do not store secrets in this variable.

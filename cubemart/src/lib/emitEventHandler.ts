@@ -1,9 +1,12 @@
 import axios from 'axios'
-import React from 'react'
 
-async function emitEventHandler(event:string,data:any,socketId?:string) {
+async function emitEventHandler(event:string,data:unknown,socketId?:string) {
   try{
-    await axios.post(`${process.env.NEXT_PUBLIC_SOCKET_SERVER}/notify`,{socketId,event,data})
+    const socketServerUrl = process.env.NEXT_SOCKET_SERVER
+    if (!socketServerUrl) {
+      throw new Error("NEXT_SOCKET_SERVER is not configured")
+    }
+    await axios.post(`${socketServerUrl}/notify`,{socketId,event,data})
   }catch(error){
     console.log(error)
   }

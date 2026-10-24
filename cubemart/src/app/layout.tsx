@@ -19,7 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="w-full min-h-screen bg-linear-to-b from-red-50 to-white">
-        <Provider>
+        <Provider socketServerUrl={process.env.NEXT_SOCKET_SERVER ?? ""}>
           <InitUser />
           {children}
         </Provider>
