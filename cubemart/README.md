@@ -34,3 +34,8 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+Configure these URLs in the Vercel project environment variables:
+
+- `APP_BASE_URL`: the public origin of the CubeMart web app (for example, its Vercel deployment URL). This is used for Stripe checkout return URLs and should remain a private server-side variable.
+- `NEXT_PUBLIC_SOCKET_SERVER`: the origin of the Socket.IO server. This is intentionally public because the browser connects to it.
