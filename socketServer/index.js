@@ -11,7 +11,7 @@ const server=http.createServer(app);
 const port=process.env.PORT||5000;
 const io=new Server(server,{
     cors:{
-        origin:process.env.APP_BASE_URL,
+        origin:process.env.NEXT_BASE_URL,
     }
 })
 
@@ -21,7 +21,7 @@ io.on("connection",(socket)=>{
             console.log("userId is null, skipping socket connection");
             return;
         }
-        await axios.post(`${process.env.APP_BASE_URL}/api/socket/connect`,{userId,socketId:socket.id})
+        await axios.post(`${process.env.NEXT_BASE_URL}/api/socket/connect`,{userId,socketId:socket.id})
     })
 
     socket.on("update-location",async({userId,latitude,longitude})=>{
@@ -29,7 +29,7 @@ io.on("connection",(socket)=>{
             type:"Point",
             coordinates:[longitude,latitude]
         }
-        await axios.post(`${process.env.APP_BASE_URL}/api/socket/update-location`,{userId,location})
+        await axios.post(`${process.env.NEXT_BASE_URL}/api/socket/update-location`,{userId,location})
         io.emit("update-deliveryBoy-location",{userId,location})
     })
 
@@ -40,7 +40,7 @@ io.on("connection",(socket)=>{
 
     socket.on("send-message",async(message)=>{
         console.log(message)
-        await axios.post(`${process.env.APP_BASE_URL}/api/chat/save`,message)
+        await axios.post(`${process.env.NEXT_BASE_URL}/api/chat/save`,message)
         io.to(message.roomId).emit("send-message",message)
     })
    
