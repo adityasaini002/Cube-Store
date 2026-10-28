@@ -7,6 +7,7 @@ import Google from "next-auth/providers/google";
 import { image } from "motion/react-client";
  
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  trustHost: true,
   providers: [
      Credential({
          credentials: {

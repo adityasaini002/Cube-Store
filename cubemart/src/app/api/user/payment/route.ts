@@ -1,7 +1,6 @@
 import connectDb from "@/lib/db";
 import Order from "@/models/order.model";
 import User from "@/models/user.model";
-import { metadata } from "motion/react-client";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
@@ -35,18 +34,28 @@ export async function POST(req: NextRequest) {
 
         })
 
+        const baseUrl = process.env.APP_BASE_URL || process.env.NEXT_BASE_URL || req.nextUrl.origin;
+        const amountInPaise = Math.round(Number(totalAmount) * 100);
+
+        if (!Number.isInteger(amountInPaise) || amountInPaise < 50 * 100) {
+            return NextResponse.json(
+                { message: "Stripe requires a valid order amount of at least ₹50" },
+                { status: 400 }
+            );
+        }
+
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             mode: 'payment',
-            success_url: `${process.env.APP_BASE_URL}/user/order-success`,
-            cancel_url: `${process.env.APP_BASE_URL}/user/order-cancel`,
+            success_url: `${baseUrl}/user/order-success`,
+            cancel_url: `${baseUrl}/user/checkout`,
             line_items: [{
                 price_data: {
                     currency: 'inr',
                     product_data: {
                         name: 'CubeMart Order Payment',
                     },
-                    unit_amount: totalAmount * 100,
+                    unit_amount: amountInPaise,
                 },
                 quantity: 1,
             },
@@ -60,8 +69,9 @@ export async function POST(req: NextRequest) {
 
 
     } catch (error) {
+        console.error("Stripe payment error:", error);
         return NextResponse.json(
-            { message: `order payment error: ${error}` },
+            { message: "Unable to create the Stripe checkout session" },
             { status: 500 }
 
         )
