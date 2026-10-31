@@ -28,21 +28,20 @@ function Login() {
         e.preventDefault();
         setLoading(true);
      try {
-        await signIn("credentials",{
-            
+        const result = await signIn("credentials",{
             email,
             password,
             redirect:false,
             callbackUrl:"/"
-
         })
-        router.push("/");
-        setLoading(false);
-       
-     
-    } catch (error) {
+        if (result?.error) {
+          throw new Error(result.error)
+        }
+        router.push(result?.url || "/");
+     } catch (error) {
         console.log(error);
-     
+     } finally {
+        setLoading(false);
      }
     }
   return (

@@ -45,20 +45,33 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     //token ke ander user ka data store krta hai
     async signIn({user,account}){
         if(account?.provider==="google"){
-            await connectDb();
-            let dbUser= await User.findOne({email:user.email});
-            if(!dbUser){
-                //create user
-                dbUser= await User.create({
-                    name:user.name,
-                    email:user.email,
-                    image:user.image
-                })
+            if(!user.email) return false;
+            try {
+                await connectDb();
+                let dbUser= await User.findOne({email:user.email});
+                if(!dbUser){
+                    dbUser= await User.create({
+                        name:user.name || "Google User",
+                        email:user.email,
+                        image:user.image,
+                        role:"user"
+                    })
+                }
+                user.id= dbUser._id.toString();
+                user.role= dbUser.role;
+            } catch (error) {
+                console.error("Google sign-in database error:", error);
+                return false;
             }
-            user.id= dbUser._id.toString();
-            user.role= dbUser.role;
         }
         return true;
+    },
+    async redirect({url, baseUrl}) {
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      try {
+        if (new URL(url).origin === baseUrl) return url;
+      } catch {}
+      return baseUrl;
     },
     jwt({ token, user, trigger, session }) {
       if (user) {
@@ -90,7 +103,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   session: {
     strategy: "jwt",
-    maxAge: 10 * 24 * 60 * 60 * 1000, // 10 days
+    maxAge: 10 * 24 * 60 * 60, // 10 days
   },
   secret: process.env.AUTH_SECRET,  
 })
